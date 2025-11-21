@@ -1,8 +1,12 @@
 import express from "express";
-import { requestLogger } from "./middleware/checkAuth";
-import authRoutes from "./routes/auth";
+import { requestLogger } from "./middleware/checkAuth.js";
+import authRoutes from "./routes/auth.js";
+import cors from "cors";
 
 const app = express();
+
+app.use(cors());
+app.use(express.json());
 
 // Middleware
 app.use(express.json()); // Parse JSON body
