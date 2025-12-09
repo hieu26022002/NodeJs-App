@@ -1,0 +1,10 @@
+[leveldb3]
+enabled = true
+dir = "/data/filerldb"
+
+[s3]
+enabled = true
+
+[s3.keys]
+# accessKey:secretKey => permission,buckets
+admin = "password => readwrite, *"

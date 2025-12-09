@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  master:
+    image: chrislusf/seaweedfs:latest
+    command: >
+      master
+      -ip=master
+      -defaultReplication=000
+      -volumeSizeLimitMB=512
+    ports:
+      - "9333:9333"
+    volumes:
+      - master_data:/data
+
+  volume:
+    image: chrislusf/seaweedfs:latest
+    command: >
+      volume
+      -ip=volume
+      -mserver=master:9333
+      -port=8080
+      -dir=/data
+    depends_on:
+      - master
+    ports:
+      - "8080:8080"
+    volumes:
+      - volume_data:/data
+
+  filer:
+    image: chrislusf/seaweedfs:latest
+    command: >
+      filer
+      -master=master:9333
+    volumes:
+      - filer_data:/data
+      - ./filer.toml:/etc/seaweedfs/filer.toml
+    depends_on:
+      - master
+    ports:
+      - "8888:8888"
+
+  s3:
+    image: chrislusf/seaweedfs:latest
+    command: >
+      s3
+      -filer=filer:8888
+      -port=8333
+    depends_on:
+      - filer
+    ports:
+      - "8333:8333"
+
+volumes:
+  master_data:
+  volume_data:
+  filer_data:

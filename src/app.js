@@ -1,7 +1,8 @@
+import cors from "cors";
 import express from "express";
 import { requestLogger } from "./middleware/checkAuth.js";
 import authRoutes from "./routes/auth.js";
-import cors from "cors";
+import storageRoutes from "./routes/storage.js";
 
 const app = express();
 
@@ -15,29 +16,28 @@ app.use(requestLogger); // Request logging
 
 // Routes
 app.use("/api/auth", authRoutes);
-// app.use("/api/users", userRoute);
+app.use("/api/upload", storageRoutes);
 
 // Health check endpoint
 app.get("/", (req, res) => {
-    res.json({ message: "API Server is running" });
+  res.json({ message: "API Server is running" });
 });
 
 // 404 handler
 app.use((req, res) => {
-    res.status(404).json({ error: "Route not found" });
+  res.status(404).json({ error: "Route not found" });
 });
 
 // Error handler
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: "Something went wrong!" });
+  console.error(err.stack);
+  res.status(500).json({ error: "Something went wrong!" });
 });
 
 
 // chạy server:
-app.listen(8080, () => {
-    console.log("Server running on http://localhost:8080");
+app.listen(8082, () => {
+  console.log("Server running on http://localhost:8082");
 });
 
 export default app;
-
