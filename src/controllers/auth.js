@@ -51,6 +51,9 @@ export const getProfile = (req, res) => {
   res.json({ id: 1, username: "demo-user", roles: ["user"] });
 };
 
+// ?? null => null undefined
+// || false => null 0 "" false undefined []
+
 // Register
 export const register = async (req, res) => {
   try {
@@ -73,7 +76,7 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Lưu vào DB
-    const user = await prisma.user.create({
+    const user = await prisma.user.findUnique({
       data: {
         email,
         password: hashedPassword,
@@ -87,3 +90,42 @@ export const register = async (req, res) => {
     return res.status(500).json({ error: "Server error" });
   }
 };
+
+// Get Information Account - Lấy thông tin cá nhân của người dùng
+export const getInfomationAccount = async (req, res) => {
+  try {
+    const userId = req.userId; // Lấy từ middleware verifyToken
+
+    if (!userId) {
+      return res.status(401).json({ error: "Không xác thực được người dùng" });
+    }
+
+    // Lấy thông tin người dùng từ database
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        createdAt: true
+        // Không trả về password
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "Không tìm thấy người dùng" });
+    }
+
+    return res.json({
+      message: "Lấy thông tin tài khoản thành công",
+      data: {
+        id: user.id,
+        email: user.email,
+        createdAt: user.createdAt
+      }
+    });
+
+  } catch (error) {
+    console.error("Get information account error:", error);
+    return res.status(500).json({ error: "Lỗi server" });
+  }
+}

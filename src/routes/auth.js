@@ -1,22 +1,15 @@
 import express from "express";
-import { login, getProfile, register } from "../controllers/auth.js";
+import { login, getProfile, register, getInfomationAccount } from "../controllers/auth.js";
+import { verifyToken } from "../middleware/checkAuth.js";
 
 const router = express.Router();
 
 router.post("/login", login);
 router.get("/profile", getProfile);
 router.post("/register", register);
+router.get("/information", verifyToken, getInfomationAccount);
 
 export default router;
-
-// const bcrypt = require("bcryptjs");
-// const jwt = require("jsonwebtoken");
-// const users = require("./users");
-
-// const app = express();
-// app.use(express.json());
-
-// const JWT_SECRET = "my-secret-key"; // bình thường phải dùng biến môi trường .env
 
 
 

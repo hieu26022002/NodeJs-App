@@ -1,6 +1,7 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 // Migrate: tạo và cập nhật các bảng trong database
 datasource db {
   provider = "mysql"
@@ -22,7 +23,3 @@ model Post {
   author    User    @relation(fields: [authorId], references: [id])
   authorId  Int
 }
-
-
-
-

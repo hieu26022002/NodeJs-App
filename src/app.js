@@ -15,6 +15,7 @@ app.use(requestLogger); // Request logging
 
 // Routes
 app.use("/api/auth", authRoutes);
+// app.use("/api/users", userRoute);
 
 // Health check endpoint
 app.get("/", (req, res) => {
