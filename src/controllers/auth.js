@@ -1,11 +1,14 @@
 import bcrypt from "bcryptjs";
-import prisma from "../prisma/index.js";
 import jwt from "jsonwebtoken";
+import prisma from "../prisma/index.js";
 
 // Login
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body ?? {};
+    console.debug("Login request Content-Type:", req.headers['content-type']);
+    console.debug("Login raw body:", req.body);
+    const payload = req.body?.data ?? req.body ?? {};
+    const { email, password } = payload;
 
     if (!email || !password) {
       return res.status(400).json({ error: "Email và password là bắt buộc" });
@@ -23,6 +26,12 @@ export const login = async (req, res) => {
 
     if (!isMatch) {
       return res.status(400).json({ error: "Sai mật khẩu" });
+    }
+
+    // Check if JWT_SECRET is configured
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET is not configured in environment variables");
+      return res.status(500).json({ error: "Cấu hình server không đúng" });
     }
 
     const token = jwt.sign(
@@ -57,7 +66,9 @@ export const getProfile = (req, res) => {
 // Register
 export const register = async (req, res) => {
   try {
-    const { email, password } = req.body ?? {}; // tránh TH req.body bị ko xác định
+    const payload = req.body?.data ?? req.body ?? {}; // tránh TH req.body bị ko xác định hoặc bọc { data: ... }
+    const { email, password } = payload;
+    console.debug("Register payload email:", email);
 
     if (!email || !password) {
       return res.status(400).json({ error: "Email và password là bắt buộc" });
@@ -76,7 +87,7 @@ export const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Lưu vào DB
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
