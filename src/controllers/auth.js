@@ -5,7 +5,6 @@ import prisma from "../prisma/index.js";
 // Login
 export const login = async (req, res) => {
   try {
-    console.debug("Login request Content-Type:", req.headers['content-type']);
     console.debug("Login raw body:", req.body);
     const payload = req.body?.data ?? req.body ?? {};
     const { email, password } = payload;
@@ -117,7 +116,8 @@ export const getInfomationAccount = async (req, res) => {
       select: {
         id: true,
         email: true,
-        createdAt: true
+        createdAt: true,
+        name: true
         // Không trả về password
       }
     });
@@ -131,7 +131,8 @@ export const getInfomationAccount = async (req, res) => {
       data: {
         id: user.id,
         email: user.email,
-        createdAt: user.createdAt
+        createdAt: user.createdAt,
+        name: user.name
       }
     });
 

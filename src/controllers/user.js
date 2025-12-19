@@ -1,4 +1,4 @@
-import User from "../model/user";
+
 
 export const userById = async (req, res,next,id) => {
     try {
@@ -11,6 +11,7 @@ export const userById = async (req, res,next,id) => {
         req.profile = user;
         next();
     } catch (error) {
-        
+        console.error("Error fetching user by ID:", error);
+        res.status(500).json({ error: "Lỗi server" });
     }
 } 
