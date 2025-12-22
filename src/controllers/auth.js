@@ -141,3 +141,47 @@ export const getInfomationAccount = async (req, res) => {
     return res.status(500).json({ error: "Lỗi server" });
   }
 }
+
+// update thông tin cá nhân
+export const updateInformationAccount = async (req, res) => {
+  try {
+    const userId = req.userId; // set bởi verifyToken
+    const payload = req.body?.data ?? req.body ?? {};
+    const { name, email } = payload;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Không xác thực được người dùng" });
+    }
+    if (!name || !email) {
+      return res.status(400).json({ error: "Thiếu name hoặc email" });
+    }
+
+    // Check trùng email:
+    const exists = await prisma.user.findFirst({
+      where: { email, NOT: { id: userId } },
+      select: { id: true },
+    });
+    if (exists) {
+      return res.status(409).json({ error: "Email trùng" });
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { name, email },
+      select: {
+        id: true,
+        email: true,
+        createdAt: true,
+        name: true,
+      },
+    });
+
+    return res.json({
+      message: "Cập nhật thông tin tài khoản thành công",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("Update information account error:", error);
+    return res.status(500).json({ error: "Lỗi server" });
+  }
+};
