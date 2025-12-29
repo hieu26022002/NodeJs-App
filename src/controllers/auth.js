@@ -185,3 +185,40 @@ export const updateInformationAccount = async (req, res) => {
     return res.status(500).json({ error: "Lỗi server" });
   }
 };
+
+// upload avatar
+export const uploadAvatar = async (req, res) => {
+  try {
+    const userId = req.userId; // set bởi verifyToken
+    const file = req.file;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Không xác thực được người dùng" });
+    }
+    if (!file) {
+      return res.status(400).json({ error: "Không có file upload" });
+    }
+
+    const avatarUrl = `/uploads/${file.filename}`;
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { avatarUrl },
+      select: {
+        id: true,
+        email: true,
+        createdAt: true,
+        name: true,
+        avatarUrl: true,
+      },
+    });
+
+    return res.json({
+      message: "Upload avatar thành công",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("Upload avatar error:", error);
+    return res.status(500).json({ error: "Lỗi server" });
+  }
+};
