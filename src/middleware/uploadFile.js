@@ -1,3 +1,4 @@
+import fs from "fs";
 import multer from "multer";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -5,9 +6,26 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Đảm bảo thư mục tồn tại
+const ensureDirectoryExists = (dirPath) => {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+};
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    // Xác định thư mục dựa trên field name
+    let uploadPath = "uploads/";
+    if (file.fieldname === "images") {
+      uploadPath = "uploads/products/";
+    } else if (file.fieldname === "avatar") {
+      uploadPath = "uploads/avatars/";
+    }
+
+    // Tạo thư mục nếu chưa tồn tại
+    ensureDirectoryExists(uploadPath);
+    cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);

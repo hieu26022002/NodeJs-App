@@ -222,3 +222,4 @@ export const uploadAvatar = async (req, res) => {
     return res.status(500).json({ error: "Lỗi server" });
   }
 };
+

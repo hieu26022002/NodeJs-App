@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import { requestLogger } from "./middleware/checkAuth.js";
 import authRoutes from "./routes/auth.js";
+import productRoute from "./routes/product.js";
 import storageRoutes from "./routes/storage.js";
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(requestLogger); // Request logging
 app.use("/api/auth", authRoutes);
 app.use("/api/upload", storageRoutes);
 app.use("/uploads", express.static("uploads"));
+app.use("/api", productRoute);
 
 // Health check endpoint
 app.get("/", (req, res) => {
@@ -31,8 +33,17 @@ app.use((req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: "Something went wrong!" });
+  console.error("Error stack:", err.stack);
+  console.error("Error message:", err.message);
+  // Nếu response đã được gửi, không gửi lại
+  if (res.headersSent) {
+    return next(err);
+  }
+  // Trả về lỗi chi tiết hơn để debug
+  res.status(err.status || 500).json({
+    error: err.message || "Something went wrong!",
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  });
 });
 
 
