@@ -44,7 +44,9 @@ export const login = async (req, res) => {
       token,
       user: {
         id: user.id,
-        email: user.email
+        email: user.email,
+        name: user.name,
+        avatarUrl: user.avatarUrl
       }
     });
 
@@ -117,8 +119,8 @@ export const getInfomationAccount = async (req, res) => {
         id: true,
         email: true,
         createdAt: true,
-        name: true
-        // Không trả về password
+        name: true,
+        avatarUrl: true
       }
     });
 
@@ -132,7 +134,8 @@ export const getInfomationAccount = async (req, res) => {
         id: user.id,
         email: user.email,
         createdAt: user.createdAt,
-        name: user.name
+        name: user.name,
+        avatarUrl: user.avatarUrl
       }
     });
 
@@ -173,6 +176,7 @@ export const updateInformationAccount = async (req, res) => {
         email: true,
         createdAt: true,
         name: true,
+        avatarUrl: true,
       },
     });
 
@@ -199,7 +203,7 @@ export const uploadAvatar = async (req, res) => {
       return res.status(400).json({ error: "Không có file upload" });
     }
 
-    const avatarUrl = `/uploads/${file.filename}`;
+    const avatarUrl = `/uploads/avatars/${file.filename}`;
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },
